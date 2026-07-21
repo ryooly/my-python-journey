@@ -8,6 +8,11 @@ class PokemonOwnerCreate(BaseModel):
     pokemon_limit: int = 6
 
 
+class PokemonOwnerLogin(BaseModel):
+    name: str
+    password: str
+
+
 class PokemonOwnerUpdate(BaseModel):
     name: str | None = None
 
