@@ -4,8 +4,8 @@ from app.schemas.pokemons import OwnedPokemonResponse
 class PokemonOwnerCreate(BaseModel):
     name: str
     age: int
+    password: str
     personality: str
-    pokemon_limit: int = 6
 
 
 class PokemonOwnerLogin(BaseModel):

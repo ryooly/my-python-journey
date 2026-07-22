@@ -20,3 +20,4 @@ async def login(user_data: PokemonOwnerLogin, db: Session = Depends(get_db)):
 async def logout():
     result:
     return result
+
