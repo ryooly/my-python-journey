@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from app.global_dependecy.password_hashing import _hash_password, _verify_password
-from app.global_dependecy.token_hashing import create_access_token, verify_access_token
+from global_dependecy.token_hashing import create_access_token, create_refresh_token
 import app.repo.auth_repo as repo
 
 from app.models.pokemon_owners import PokemonOwner
@@ -48,6 +48,8 @@ class PokemonOwnerService:
 
         access_token = create_access_token(payload)
 
+        refresh_token = create_refresh_token(payload)
+
         return {
             "owner": new_owner,
             "access_token": access_token,
@@ -56,7 +58,7 @@ class PokemonOwnerService:
     async def login(self, data: PokemonOwnerLogin) -> PokemonOwner:
         owner = self._get_by_name(data.name)
 
-        if not owner or not self._verify_password(data.password, owner.hashed_password):
+        if not owner or not _verify_password(data.password, owner.hashed_password):
             # error handler
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -69,6 +71,8 @@ class PokemonOwnerService:
         }
 
         access_token = create_access_token(payload)
+
+        refresh_token = create_refresh_token(payload)
 
         return {
             "owner": owner,
