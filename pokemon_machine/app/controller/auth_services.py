@@ -13,3 +13,7 @@ async def loginHandle(user_data: PokemonOwnerCreate, db: Session) -> PokemonOwne
     result = service.register(user_data)
     return result
 
+async def logoutHandle(user_id: str, db: Session) -> dict:
+    service = PokemonOwnerService(db)
+    result = service.logout(user_id)
+    return result;

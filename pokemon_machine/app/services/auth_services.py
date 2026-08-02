@@ -78,3 +78,6 @@ class PokemonOwnerService:
             "owner": owner,
             "access_token": access_token,
         }
+
+    async def logout(self, user_id: str) -> dict:
+        existing = await repo.

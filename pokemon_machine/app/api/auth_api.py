@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import crud
 from schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
-from app.controller.auth_services import createIdentityHandle, loginHandle
+from app.controller.auth_services import createIdentityHandle, loginHandle, logoutHandle
 
 app = FastAPI()
 
@@ -19,7 +19,6 @@ async def login(user_data: PokemonOwnerLogin, db: Session = Depends(get_db)):
     return result
 
 @app.post('/auth/logout')
-async def logout():
-    result = 
+async def logout(user_id: str, db: Session = Depends(get_db)):
+    result = await logoutHandle(user_id, db)
     return result
-
