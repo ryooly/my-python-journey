@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from app.global_dependecy.password_hashing import _hash_password, _verify_password
 from global_dependecy.token_hashing import create_access_token, create_refresh_token
 import app.repo.auth_repo as repo
+import app.repo.token_repo as token_repo
 
 from app.models.pokemon_owners import PokemonOwner
 from app.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
@@ -80,4 +81,9 @@ class PokemonOwnerService:
         }
 
     async def logout(self, user_id: str) -> dict:
-        existing = await repo.
+        existing = await token_repo.get_refresh_token_by_user_id(user_id)
+        if not existing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Refresh token not found.",
+            )

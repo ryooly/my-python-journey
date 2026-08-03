@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import crud
 from schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
-from app.controller.auth_services import createIdentityHandle, loginHandle, logoutHandle
+from app.controller.auth_controller import createIdentityHandle, loginHandle, logoutHandle
 
 app = FastAPI()
 
