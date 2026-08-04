@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, func
 from app.models.refresh_token import RefreshToken
 
 class TokenRepository:
@@ -17,4 +17,14 @@ class TokenRepository:
         async def get_refresh_token_by_user_id(self, user_id: int) -> RefreshToken | None:
             return self.db.query(RefreshToken).filter(RefreshToken.user_id == user_id).first();
         
-        asycn def revoked
+        async def revoke_refresh_token(self, user_id: int) -> str:
+            return self.db.query(RefreshToken).filter(RefreshToken.user_id == user_id).update({
+                "is_revoked": True, "revoked_at": func.now()
+                });
+            self.db.commit()
+
+        
+
+        
+
+            

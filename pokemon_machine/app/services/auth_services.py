@@ -87,3 +87,12 @@ class PokemonOwnerService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Refresh token not found.",
             )
+        result = await token_repo.revoke_refresh_token(user_id)
+        return {
+            "status": "success",
+            "message": "Logout successful",
+        }
+
+
+
+# besok tambahkan try catch dan kemduain tambahkan fungsi create refrehs token di login dan refister
