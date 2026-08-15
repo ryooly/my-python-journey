@@ -1,8 +1,14 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status
 from app.global_dependecy.password_hashing import _hash_password, _verify_password
 from global_dependecy.token_hashing import create_access_token, create_refresh_token
+from exceptions.global import (
+    DataAlreadyExistsException,
+    FailedInsertDataException,
+    VerificationFailedException,
+    DataNotFoundException,
+    UniversalProblemException,
+)
 import app.repo.auth_repo as repo
 import app.repo.token_repo as token_repo
 
@@ -24,10 +30,7 @@ class PokemonOwnerService:
             existing = await self._get_by_name(data.name)
 
             if existing:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Nama owner sudah terdaftar.",
-                )
+                raise DataAlreadyExistsException()
 
             new_owner = PokemonOwner(
                 name=data.name,
@@ -40,10 +43,7 @@ class PokemonOwnerService:
                 new_owner = await repo.create(new_owner)
 
             except IntegrityError:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Failed to create owner. The name may already be in use.",
-                )
+                raise FailedInsertDataException()
 
             payload = {
                 "id": new_owner.id,
@@ -60,13 +60,12 @@ class PokemonOwnerService:
                 "access_token": access_token,
             }
 
-        except HTTPException:
+        except (DataAlreadyExistsException, FailedInsertDataException):
             raise
 
         except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Terjadi kesalahan saat melakukan registrasi.",
+            raise UniversalProblemException(
+                message="An error occurred during registration",
             )
 
     async def login(self, data: PokemonOwnerLogin) -> PokemonOwner:
@@ -77,10 +76,7 @@ class PokemonOwnerService:
                 data.password,
                 owner.hashed_password,
             ):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Nama atau password salah.",
-                )
+                raise VerificationFailedException()
 
             payload = {
                 "id": owner.id,
@@ -97,13 +93,12 @@ class PokemonOwnerService:
                 "access_token": access_token,
             }
 
-        except HTTPException:
+        except VerificationFailedException:
             raise
 
         except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Terjadi kesalahan saat melakukan login.",
+            raise UniversalProblemException(
+                message="An error occurred during login",
             )
 
     async def logout(self, user_id: str) -> dict:
@@ -111,10 +106,7 @@ class PokemonOwnerService:
             existing = await token_repo.get_refresh_token_by_user_id(user_id)
 
             if not existing:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Refresh token not found.",
-                )
+                raise DataNotFoundException()
 
             await token_repo.revoke_refresh_token(user_id)
 
@@ -123,15 +115,12 @@ class PokemonOwnerService:
                 "message": "Logout successful",
             }
 
-        except HTTPException:
+        except DataNotFoundException:
             raise
 
         except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Terjadi kesalahan saat melakukan logout.",
+            raise UniversalProblemException(
+                message="An error occurred during logout",
             )
 
 
-
-# DONE JUST NEED TO ADDED ERROR HANDLER
