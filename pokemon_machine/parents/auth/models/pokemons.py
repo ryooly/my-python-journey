@@ -9,7 +9,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from app.db.base import Base
+from parents.auth.db.base import Base
 
 class PokemonStatus(str, enum):
     ALIVE = "alive"

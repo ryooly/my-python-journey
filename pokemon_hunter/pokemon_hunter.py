@@ -1,5 +1,11 @@
 import requests
+import importlib
 from services.services import create_pokemon
+
+_errors = importlib.import_module("exceptions.global")
+FailedInsertDataException = _errors.FailedInsertDataException
+DataNotFoundException = _errors.DataNotFoundException
+UniversalProblemException = _errors.UniversalProblemException
 
 async def get_pokemon(name_id):
     try:
@@ -11,14 +17,22 @@ async def get_pokemon(name_id):
 
         result = await create_pokemon(data)
 
-        # tambahkan errrorHandler
+        if not result:
+            raise FailedInsertDataException()
+            
 
         return result
 
-    except requests.exceptions.HTTPError as e:
-        print(f"Pokémon not found: {e}")
-        return None #ganti jadi error yang berkualitas
+    except FailedInsertDataException:
+        raise
 
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to retrieve Pokémon data: {e}")
-        return None #ganti jadi error yang berkualitas
+    except DataNotFoundException:
+        raise
+
+    except requests.exceptions.RequestException:
+        raise DataNotFoundException()
+
+    except Exception:
+        raise UniversalProblemException(
+            message="An unexpected error occurred while fetching Pokémon data",
+        )

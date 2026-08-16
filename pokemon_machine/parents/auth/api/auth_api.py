@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
-from pokemon_machine.app.db import session
+from pokemon_machine.parents.auth.db import session
 from sqlalchemy.orm import Session
 from database import get_db
 import crud
 from schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
-from app.controller.auth_controller import createIdentityHandle, loginHandle, logoutHandle
+from parents.auth.controller.auth_controller import createIdentityHandle, loginHandle, logoutHandle
 from exceptions.base import AppException
 from handlers.app_exception import app_exception_handler
 

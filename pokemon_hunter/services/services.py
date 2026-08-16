@@ -1,4 +1,4 @@
-from pokemon_machine.app.db.session import SessionLocal
+from pokemon_machine.parents.auth.db.session import SessionLocal
 from repositories.insert_pokemon import PokemonRepository
 
 
@@ -18,7 +18,11 @@ class PokemonService:
 
         except Exception:
             db.rollback()
-            raise
+            raise UniversalProblemException(
+                message="An error occurred while creating a pokemon",
+            )
 
         finally:
             db.close()
+
+

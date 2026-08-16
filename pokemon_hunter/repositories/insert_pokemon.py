@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from pokemon_machine.app.models.pokemons import Pokemon
+from pokemon_machine.parents.auth.models.pokemons import Pokemon
 
 
 class PokemonRepository:

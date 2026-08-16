@@ -1,19 +1,20 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from app.global_dependecy.password_hashing import _hash_password, _verify_password
+import importlib
+from parents.auth.global_dependecy.password_hashing import _hash_password, _verify_password
 from global_dependecy.token_hashing import create_access_token, create_refresh_token
-from exceptions.global import (
-    DataAlreadyExistsException,
-    FailedInsertDataException,
-    VerificationFailedException,
-    DataNotFoundException,
-    UniversalProblemException,
-)
-import app.repo.auth_repo as repo
-import app.repo.token_repo as token_repo
 
-from app.models.pokemon_owners import PokemonOwner
-from app.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
+_errors = importlib.import_module("parents.auth.exceptions.global")
+DataAlreadyExistsException = _errors.DataAlreadyExistsException
+FailedInsertDataException = _errors.FailedInsertDataException
+VerificationFailedException = _errors.VerificationFailedException
+DataNotFoundException = _errors.DataNotFoundException
+UniversalProblemException = _errors.UniversalProblemException
+import parents.auth.repo.auth_repo as repo
+import parents.auth.repo.token_repo as token_repo
+
+from parents.auth.models.pokemon_owners import PokemonOwner
+from parents.auth.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
 
 
 class PokemonOwnerService:

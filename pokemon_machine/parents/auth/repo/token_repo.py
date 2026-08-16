@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, func
-from app.models.refresh_token import RefreshToken
+from parents.auth.models.refresh_token import RefreshToken
 
 class TokenRepository:
     def __init__(self, db: Session):
