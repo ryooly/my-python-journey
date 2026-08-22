@@ -3,18 +3,9 @@ from game_feature.math_quiz import run_quiz
 
 API_BASE = "http://localhost:8000"
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def _input(prompt: str) -> str:
     """Thin wrapper so every input() call lives in one place."""
     return input(prompt).strip()
-
-
-# ---------------------------------------------------------------------------
-# Auth actions
-# ---------------------------------------------------------------------------
 
 def do_register() -> dict | None:
     print("\n--- Register ---")
@@ -37,7 +28,7 @@ def do_register() -> dict | None:
         if res.ok:
             print("\n  Registration successful! You may now log in.")
             return None  # no auto-login; user picks Login from the menu
-        else:
+        else: 
             body = res.json()
             print(f"\n  Registration failed: {body.get('message', res.text)}")
             return None
@@ -91,28 +82,20 @@ def do_logout(session: dict) -> None:
     except requests.exceptions.ConnectionError:
         print("\n  Cannot reach the server. Is it running?")
 
-
-# ---------------------------------------------------------------------------
-# Get Pokemon
-# ---------------------------------------------------------------------------
-
 def do_get_pokemon(session: dict) -> None:
     owner = session.get("owner", {})
     pokemon_count = owner.get("pokemon_count", 0)
     pokemon_limit = owner.get("pokemon_limit", 3)
 
-    # ---- limit check ----
     if pokemon_count >= pokemon_limit:
         print(f"\n  You already have {pokemon_count}/{pokemon_limit} Pokemon.")
         print("  Your storage is full! Release one before catching a new one.")
         return
 
     print(f"\n  You have {pokemon_count}/{pokemon_limit} Pokemon. Let's go!")
-
-    # ---- math quiz ----
+    
     pokemon_id = run_quiz()
 
-    # ---- fetch from PokeAPI via pokemon_hunter ----
     try:
         from pokemon_hunter.pokemon_hunter import get_pokemon
 
@@ -126,11 +109,6 @@ def do_get_pokemon(session: dict) -> None:
 
     except Exception as exc:
         print(f"\n  Something went wrong while catching a Pokemon: {exc}")
-
-
-# ---------------------------------------------------------------------------
-# Menus
-# ---------------------------------------------------------------------------
 
 def _entry_menu() -> str:
     print("\n===========================================")
@@ -150,16 +128,10 @@ def _main_menu(name: str) -> str:
     print("  2. Logout")
     return _input("\n  Choose > ")
 
-
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
-
 def main():
     session: dict | None = None
 
     while True:
-        # ---- before login ----
         if session is None:
             choice = _entry_menu()
 
@@ -173,7 +145,6 @@ def main():
             else:
                 print("\n  Invalid choice.")
 
-        # ---- after login ----
         else:
             owner = session.get("owner", {})
             choice = _main_menu(owner.get("name", "Trainer"))
