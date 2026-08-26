@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 import importlib
+
 from parents.auth.global_dependecy.password_hashing import _hash_password, _verify_password
-from global_dependecy.token_hashing import create_access_token, create_refresh_token
+from parents.auth.global_dependecy.token_hashing import create_access_token, create_refresh_token
+from parents.auth.repo.auth_repo import PokemonOwnerRepository
+from parents.auth.repo.token_repo import TokenRepository
+from parents.auth.models.pokemon_owners import PokemonOwner
+from parents.auth.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
 
 _errors = importlib.import_module("parents.auth.exceptions.global")
 DataAlreadyExistsException = _errors.DataAlreadyExistsException
@@ -10,25 +15,21 @@ FailedInsertDataException = _errors.FailedInsertDataException
 VerificationFailedException = _errors.VerificationFailedException
 DataNotFoundException = _errors.DataNotFoundException
 UniversalProblemException = _errors.UniversalProblemException
-import parents.auth.repo.auth_repo as repo
-import parents.auth.repo.token_repo as token_repo
-
-from parents.auth.models.pokemon_owners import PokemonOwner
-from parents.auth.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
 
 
 class PokemonOwnerService:
 
     def __init__(self, db: Session):
         self.db = db
+        self.owner_repo = PokemonOwnerRepository(db)
+        self.token_repo = TokenRepository(db)
 
-    async def _get_by_name(self, name: str) -> PokemonOwner | None:
-        user = await repo.get_by_name(name)
-        return user
+    def _get_by_name(self, name: str) -> PokemonOwner | None:
+        return self.owner_repo.get_by_name(name)
 
-    async def register(self, data: PokemonOwnerCreate) -> PokemonOwner:
+    def register(self, data: PokemonOwnerCreate) -> dict:
         try:
-            existing = await self._get_by_name(data.name)
+            existing = self._get_by_name(data.name)
 
             if existing:
                 raise DataAlreadyExistsException()
@@ -41,9 +42,9 @@ class PokemonOwnerService:
             )
 
             try:
-                new_owner = await repo.create(new_owner)
-
+                new_owner = self.owner_repo.create(new_owner)
             except IntegrityError:
+                self.db.rollback()
                 raise FailedInsertDataException()
 
             payload = {
@@ -54,7 +55,7 @@ class PokemonOwnerService:
             access_token = create_access_token(payload)
             refresh_token = create_refresh_token(payload)
 
-            await token_repo.create_refresh_token(refresh_token)
+            self.token_repo.create_refresh_token(refresh_token, new_owner.id)
 
             return {
                 "owner": new_owner,
@@ -69,9 +70,9 @@ class PokemonOwnerService:
                 message="An error occurred during registration",
             )
 
-    async def login(self, data: PokemonOwnerLogin) -> PokemonOwner:
+    def login(self, data: PokemonOwnerLogin) -> dict:
         try:
-            owner = await self._get_by_name(data.name)
+            owner = self._get_by_name(data.name)
 
             if not owner or not _verify_password(
                 data.password,
@@ -87,7 +88,7 @@ class PokemonOwnerService:
             access_token = create_access_token(payload)
             refresh_token = create_refresh_token(payload)
 
-            await token_repo.create_refresh_token(refresh_token)
+            self.token_repo.create_refresh_token(refresh_token, owner.id)
 
             return {
                 "owner": owner,
@@ -102,14 +103,14 @@ class PokemonOwnerService:
                 message="An error occurred during login",
             )
 
-    async def logout(self, user_id: str) -> dict:
+    def logout(self, user_id: str) -> dict:
         try:
-            existing = await token_repo.get_refresh_token_by_user_id(user_id)
+            existing = self.token_repo.get_refresh_token_by_user_id(int(user_id))
 
             if not existing:
                 raise DataNotFoundException()
 
-            await token_repo.revoke_refresh_token(user_id)
+            self.token_repo.revoke_refresh_token(int(user_id))
 
             return {
                 "status": "success",
@@ -123,5 +124,3 @@ class PokemonOwnerService:
             raise UniversalProblemException(
                 message="An error occurred during logout",
             )
-
-

@@ -1,19 +1,22 @@
+import enum as _enum
+
 from sqlalchemy import (
     Column,
     Integer,
     String,
     JSON,
     DateTime,
-    enum
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from parents.auth.db.base import Base
 
-class PokemonStatus(str, enum):
+
+class PokemonStatus(str, _enum.Enum):
     ALIVE = "alive"
     DEAD = "dead"
+
 
 class Pokemon(Base):
     __tablename__ = "pokemons"
@@ -25,10 +28,10 @@ class Pokemon(Base):
     weight = Column(Integer)
     order = Column(Integer)
     status = Column(
-    enum(PokemonStatus),
-    default=PokemonStatus.ALIVE,
-    nullable=False
-)
+        String(20),
+        default=PokemonStatus.ALIVE.value,
+        nullable=False,
+    )
     types = Column(JSON)
     abilities = Column(JSON)
     stats = Column(JSON)

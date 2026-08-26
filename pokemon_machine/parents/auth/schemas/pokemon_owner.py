@@ -1,5 +1,5 @@
 from pydantic import BaseModel, computed_field
-from parents.auth.schemas.pokemons import OwnedPokemonResponse
+from parents.auth.schemas.owned_pokemon import OwnedPokemonResponse
 
 class PokemonOwnerCreate(BaseModel):
     name: str

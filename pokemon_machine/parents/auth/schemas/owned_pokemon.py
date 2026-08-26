@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from parents.auth.models.pokemon_owners import PokemonStatus
+from parents.auth.models.pokemons import PokemonStatus
 
 
 class OwnedPokemonCreate(BaseModel):

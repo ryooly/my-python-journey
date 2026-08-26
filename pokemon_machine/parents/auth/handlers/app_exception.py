@@ -1,6 +1,6 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from exceptions.base import AppException
+from parents.auth.exceptions.base import AppException
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:

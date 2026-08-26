@@ -1,4 +1,4 @@
-from exceptions.base import AppException
+from parents.auth.exceptions.base import AppException
 
 DATA_ALREADY_EXISTS_CODE = 409
 FAILED_INSERT_DATA_CODE = 500

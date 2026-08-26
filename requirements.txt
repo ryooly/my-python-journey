@@ -1,0 +1,19 @@
+# Web framework
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy
+asyncpg
+psycopg2-binary
+
+# Validation (included with fastapi, listed for clarity)
+pydantic
+
+# Auth / Security
+PyJWT
+passlib[bcrypt]
+bcrypt
+
+# HTTP client
+requests

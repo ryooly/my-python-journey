@@ -5,7 +5,6 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
-    enum
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
