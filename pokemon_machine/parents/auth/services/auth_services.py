@@ -65,9 +65,11 @@ class PokemonOwnerService:
         except (DataAlreadyExistsException, FailedInsertDataException):
             raise
 
-        except Exception:
+        except Exception as e:
+            detail = f"{type(e).__name__}: {e}"
+            print(f"\n  [DEBUG] register error: {detail}")
             raise UniversalProblemException(
-                message="An error occurred during registration",
+                message=f"An error occurred during registration — {detail}",
             )
 
     def login(self, data: PokemonOwnerLogin) -> dict:
@@ -98,9 +100,11 @@ class PokemonOwnerService:
         except VerificationFailedException:
             raise
 
-        except Exception:
+        except Exception as e:
+            detail = f"{type(e).__name__}: {e}"
+            print(f"\n  [DEBUG] login error: {detail}")
             raise UniversalProblemException(
-                message="An error occurred during login",
+                message=f"An error occurred during login — {detail}",
             )
 
     def logout(self, user_id: str) -> dict:
@@ -120,7 +124,9 @@ class PokemonOwnerService:
         except DataNotFoundException:
             raise
 
-        except Exception:
+        except Exception as e:
+            detail = f"{type(e).__name__}: {e}"
+            print(f"\n  [DEBUG] logout error: {detail}")
             raise UniversalProblemException(
-                message="An error occurred during logout",
+                message=f"An error occurred during logout — {detail}",
             )

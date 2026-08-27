@@ -5,6 +5,7 @@ from parents.auth.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerL
 from parents.auth.controller.auth_controller import createIdentityHandle, loginHandle, logoutHandle
 from parents.auth.exceptions.base import AppException
 from parents.auth.handlers.app_exception import app_exception_handler
+import parents.auth.models  # noqa: ensure all models are loaded for relationship resolution
 
 app = FastAPI()
 app.add_exception_handler(AppException, app_exception_handler)

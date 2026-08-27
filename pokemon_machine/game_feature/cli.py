@@ -37,7 +37,6 @@ def do_register() -> dict | None:
         print("\n  Cannot reach the server. Is it running?")
         return None
 
-
 def do_login() -> dict | None:
     print("\n--- Login ---")
     name     = _input("Name     : ")
