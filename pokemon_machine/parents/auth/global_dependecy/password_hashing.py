@@ -1,22 +1,19 @@
-from passlib.context import CryptContext
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# bcrypt has a hard 72-byte limit on password length
-_BCRYPT_MAX_BYTES = 72
+ph = PasswordHasher()  # parameter default sudah cukup aman, bisa di-tune
 
 
 def _hash_password(password: str) -> str:
-    truncated = password.encode("utf-8")[:_BCRYPT_MAX_BYTES]
-    return pwd_context.hash(truncated)
+    return ph.hash(password)
 
 
 def _verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
-    truncated = plain_password.encode("utf-8")[:_BCRYPT_MAX_BYTES]
-    return pwd_context.verify(truncated, hashed_password)
-
-
-# ERROR IS HERE
+    try:
+        ph.verify(hashed_password, plain_password)
+        return True
+    except VerifyMismatchError:
+        return False
