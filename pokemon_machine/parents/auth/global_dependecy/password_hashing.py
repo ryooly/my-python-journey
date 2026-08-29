@@ -1,11 +1,16 @@
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-
-ph = PasswordHasher()  # parameter default sudah cukup aman, bisa di-tune
+import bcrypt
 
 
 def _hash_password(password: str) -> str:
-    return ph.hash(password)
+    password_bytes = password.encode("utf-8")
+
+    if len(password_bytes) > 72:
+        raise ValueError("Password cannot be longer than 72 bytes")
+
+    return bcrypt.hashpw(
+        password_bytes,
+        bcrypt.gensalt()
+    ).decode("utf-8")
 
 
 def _verify_password(
@@ -13,7 +18,9 @@ def _verify_password(
     hashed_password: str,
 ) -> bool:
     try:
-        ph.verify(hashed_password, plain_password)
-        return True
-    except VerifyMismatchError:
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"),
+            hashed_password.encode("utf-8"),
+        )
+    except (ValueError, TypeError):
         return False
