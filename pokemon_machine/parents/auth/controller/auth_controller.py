@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from parents.auth.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin, PokemonOwnerResponse
+from parents.auth.schemas.pokemon_owner import PokemonOwnerCreate, PokemonOwnerLogin
 from parents.auth.services.auth_services import PokemonOwnerService
 
 
