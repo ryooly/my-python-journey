@@ -71,7 +71,7 @@ def do_logout(session: dict) -> None:
     try:
         res = requests.post(
             f"{API_BASE}/auth/logout",
-            json={"user_id": str(user_id)},
+            params={"user_id": str(user_id)},
         )
 
         if res.ok:
