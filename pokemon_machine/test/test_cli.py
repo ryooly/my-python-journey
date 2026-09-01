@@ -111,7 +111,7 @@ class TestDoGetPokemon:
     def test_calls_quiz_when_under_limit(self, _mock_req, mock_quiz, fake_session, capsys):
         # We need to also mock the dynamic import of pokemon_hunter
         with patch.dict("sys.modules", {"pokemon_hunter": MagicMock(), "pokemon_hunter.pokemon_hunter": MagicMock()}):
-            import pokemon_hunter.pokemon_hunter as ph
+            import pokemon_hunter.calling as ph
             ph.get_pokemon = MagicMock(return_value={"name": "pikachu"})
 
             do_get_pokemon(fake_session)

@@ -1,5 +1,7 @@
+import asyncio
 import requests
 from game_feature.math_quiz import run_quiz
+from pokemon_hunter.calling import get_pokemon
 
 API_BASE = "http://localhost:8000"
 
@@ -81,7 +83,7 @@ def do_logout(session: dict) -> None:
     except requests.exceptions.ConnectionError:
         print("\n  Cannot reach the server. Is it running?")
 
-def do_get_pokemon(session: dict) -> None:
+async def do_get_pokemon(session: dict) -> None:
     owner = session.get("owner", {})
     pokemon_count = owner.get("pokemon_count", 0)
     pokemon_limit = owner.get("pokemon_limit", 3)
@@ -96,13 +98,31 @@ def do_get_pokemon(session: dict) -> None:
     pokemon_id = run_quiz()
 
     try:
-        from pokemon_hunter.pokemon_hunter import get_pokemon
-
-        result = get_pokemon(pokemon_id)
+        result = await get_pokemon(pokemon_id)
 
         if result:
-            name = getattr(result, "name", None) or result.get("name", "???")
-            print(f"\n  You caught {name.upper()}! (ID #{pokemon_id})")
+            types = ", ".join(t["name"].capitalize() for t in result.types)
+            abilities = ", ".join(a["name"].replace("-", " ").title() for a in result.abilities)
+
+            stats_map = {s["name"]: s["base_stat"] for s in result.stats}
+            hp = stats_map.get("hp", "?")
+            attack = stats_map.get("attack", "?")
+            defense = stats_map.get("defense", "?")
+            speed = stats_map.get("speed", "?")
+
+            print(f"\n  ╔══════════════════════════════════════╗")
+            print(f"    You caught {result.name.upper()}! (#{result.pokeapi_id})")
+            print(f"  ╚══════════════════════════════════════╝")
+            print(f"    Type       : {types}")
+            print(f"    Abilities  : {abilities}")
+            print(f"    Height     : {result.height / 10} m")
+            print(f"    Weight     : {result.weight / 10} kg")
+            print(f"    Base EXP   : {result.base_experience}")
+            print(f"\n    Stats")
+            print(f"      HP      : {hp}")
+            print(f"      Attack  : {attack}")
+            print(f"      Defense : {defense}")
+            print(f"      Speed   : {speed}")
         else:
             print(f"\n  No Pokemon found for ID #{pokemon_id}.")
 
@@ -127,7 +147,7 @@ def _main_menu(name: str) -> str:
     print("  2. Logout")
     return _input("\n  Choose > ")
 
-def main():
+async def main():
     session: dict | None = None
 
     while True:
@@ -149,7 +169,7 @@ def main():
             choice = _main_menu(owner.get("name", "Trainer"))
 
             if choice == "1":
-                do_get_pokemon(session)
+                await do_get_pokemon(session)
             elif choice == "2":
                 do_logout(session)
                 session = None
@@ -158,4 +178,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
