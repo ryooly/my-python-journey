@@ -13,3 +13,5 @@ services:
 
 volumes:
   pgdata:
+
+# apa jangan jangan belum dinyalakan yaa untuk api 
