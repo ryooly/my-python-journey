@@ -1,4 +1,4 @@
-# Pokemate
+# Pokemate (1)
 
 A Pokémon-catching game with a **FastAPI** backend and an interactive **CLI** client.
 Trainers register an account, log in, and solve a math quiz — their answers are
